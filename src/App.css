@@ -51,8 +51,6 @@
 }
 
 .list-digit {
-  /* position: absolute;
-  transition-property: all; */
 }
 
 .digit-box {
@@ -67,15 +65,13 @@
 .controller {
   padding: 20px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-@keyframes rolling {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-100%);
-  }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
