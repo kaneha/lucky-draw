@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import './App.css';
 import Slider from 'react-slick';
@@ -6,7 +6,7 @@ import Slider from 'react-slick';
 function delay(delayInMs) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(2);
+      resolve();
     }, delayInMs);
   });
 }
@@ -27,7 +27,8 @@ function getRandomNumberInRange(min, max) {
 function App() {
   const [valueRange, setValueRange] = useState({ min: 0, max: 100 });
   const [listInterval, setListInterval] = useState([]);
-  const [result, setResult] = useState(null);
+  const [delayTime, setDelayTime] = useState(5);
+  // const [result, setResult] = useState(null);
 
   const sliderRef = useRef([]);
   sliderRef.current = [];
@@ -40,7 +41,7 @@ function App() {
   );
 
   const onStart = async () => {
-    setResult(null);
+    // setResult(null);
     if (Number(valueRange.max) <= Number(valueRange.min)) {
       return;
     }
@@ -54,42 +55,47 @@ function App() {
     }
   };
 
-  const onStop = async () => {
-    let resultInString = result;
-    if (!result) {
-      const random = getRandomNumberInRange(valueRange.min, valueRange.max);
-      const resultTemp =
-        String('0').repeat(numOfDigits - String(random).length) +
-        String(random);
-      resultInString = resultTemp;
-      setResult(resultTemp);
-    }
-    const lastIntervalIndex = listInterval.length - 1;
-    clearInterval(listInterval[lastIntervalIndex]);
-    await delay(100);
-    sliderRef.current[lastIntervalIndex].slickGoTo(
-      Number(resultInString[lastIntervalIndex])
-    );
-    setListInterval((prev) => {
-      prev.pop();
-      return prev;
-    });
-    // for (let i = listInterval.length - 1; i > -1; i--) {
-    //   await delay(500);
-    //   clearInterval(listInterval[i]);
-    //   await delay(100);
-    //   sliderRef.current[i].slickGoTo(Number(resultInString[i]));
+  const onStop = useCallback(async () => {
+    // let resultInString = result;
+    // if (!result) {
+    const random = getRandomNumberInRange(valueRange.min, valueRange.max);
+    const resultTemp =
+      String('0').repeat(numOfDigits - String(random).length) + String(random);
+    //   resultInString = resultTemp;
+    //   setResult(resultTemp);
     // }
-    // setListInterval([]);
-  };
-
-  console.log(listInterval);
+    // const lastIntervalIndex = listInterval.length - 1;
+    // clearInterval(listInterval[lastIntervalIndex]);
+    // await delay(100);
+    // sliderRef.current[lastIntervalIndex].slickGoTo(
+    //   Number(resultInString[lastIntervalIndex])
+    // );
+    // setListInterval((prev) => {
+    //   prev.pop();
+    //   return prev;
+    // });
+    for (let i = listInterval.length - 1; i > -1; i--) {
+      await delay(500);
+      clearInterval(listInterval[i]);
+      await delay(100);
+      sliderRef.current[i].slickGoTo(Number(resultTemp[i]));
+    }
+    setListInterval([]);
+  }, [valueRange, listInterval, numOfDigits]);
 
   const onChangeRange = ({ target }) => {
-    setValueRange((prev) => ({
-      ...prev,
-      [target.name]: target.value,
-    }));
+    if (!isDrawing) {
+      setValueRange((prev) => ({
+        ...prev,
+        [target.name]: target.value,
+      }));
+    }
+  };
+
+  const onChangeDelay = ({ target }) => {
+    if (!isDrawing) {
+      setDelayTime(target.value);
+    }
   };
 
   const addToRefs = (el) => {
@@ -100,7 +106,7 @@ function App() {
 
   const isDrawing = listInterval.length > 0;
 
-  const settings = {
+  const sliderSettings = {
     infinite: true,
     speed: 50,
     slidesToShow: 1,
@@ -111,6 +117,18 @@ function App() {
     swipe: false,
   };
 
+  useEffect(() => {
+    let delayStop = null;
+    if (isDrawing) {
+      delayStop = setTimeout(() => {
+        onStop();
+      }, numOfDigits * 500 + Number(delayTime) * 1000);
+    }
+    return () => {
+      clearTimeout(delayStop);
+    };
+  }, [isDrawing, numOfDigits, delayTime, onStop]);
+
   return (
     <div className='app'>
       <div className='container'>
@@ -118,7 +136,7 @@ function App() {
           <div className='display-digit-box' key={_}>
             <div className='list-digit'>
               {numOfDigits > 0 && (
-                <Slider {...settings} ref={addToRefs}>
+                <Slider {...sliderSettings} ref={addToRefs}>
                   {listDigits.map((digit) => (
                     <div key={digit}>
                       <div className='digit-box'>{digit}</div>
@@ -150,12 +168,19 @@ function App() {
               value={valueRange.max}
             />
           </div>
+          <div className='input-block'>
+            <label>Delay in (s):</label>
+            <input
+              name='delay'
+              type='number'
+              onChange={onChangeDelay}
+              value={delayTime}
+            />
+          </div>
         </div>
-        {isDrawing ? (
-          <button onClick={onStop}>Stop</button>
-        ) : (
-          <button onClick={onStart}>Start</button>
-        )}
+        <button onClick={onStart} disabled={isDrawing}>
+          Start
+        </button>
       </div>
     </div>
   );
