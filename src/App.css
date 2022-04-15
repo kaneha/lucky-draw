@@ -106,6 +106,10 @@ input {
   font-size: 1rem;
 }
 
+input:disabled {
+  cursor: not-allowed;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;

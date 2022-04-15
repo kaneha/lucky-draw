@@ -168,6 +168,7 @@ function App() {
             <input
               name='min'
               type='number'
+              disabled={isDrawing}
               onChange={onChangeRange}
               value={valueRange.min}
             />
@@ -177,6 +178,7 @@ function App() {
             <input
               name='max'
               type='number'
+              disabled={isDrawing}
               onChange={onChangeRange}
               value={valueRange.max}
             />
@@ -186,6 +188,7 @@ function App() {
             <input
               name='delay'
               type='number'
+              disabled={isDrawing}
               onChange={onChangeDelay}
               value={delayTime}
             />
@@ -195,6 +198,7 @@ function App() {
             <input
               name='start'
               type='number'
+              disabled={isDrawing}
               onChange={onChangeDelayTimeBetweenDigits}
               value={delayTimeBetweenDigits.start}
             />
@@ -204,6 +208,7 @@ function App() {
             <input
               name='end'
               type='number'
+              disabled={isDrawing}
               onChange={onChangeDelayTimeBetweenDigits}
               value={delayTimeBetweenDigits.end}
             />
