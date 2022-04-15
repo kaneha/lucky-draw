@@ -191,7 +191,7 @@ function App() {
             />
           </div>
           <div className='input-block'>
-            <label>Delay between digits at start (s):</label>
+            <label>Delay between digits at the begin (s):</label>
             <input
               name='start'
               type='number'
@@ -200,7 +200,7 @@ function App() {
             />
           </div>
           <div className='input-block'>
-            <label>Delay between digits at stop (s):</label>
+            <label>Delay between digits at the finish (s):</label>
             <input
               name='end'
               type='number'
