@@ -24,10 +24,25 @@ function getRandomNumberInRange(min, max) {
   }
 }
 
+const sliderSettings = {
+  infinite: true,
+  speed: 50,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  arrow: false,
+  vertical: true,
+  accessibility: false,
+  swipe: false,
+};
+
 function App() {
   const [valueRange, setValueRange] = useState({ min: 0, max: 100 });
   const [listInterval, setListInterval] = useState([]);
   const [delayTime, setDelayTime] = useState(5);
+  const [delayTimeBetweenDigits, setDelayTimeBetweenDigits] = useState({
+    start: 0.5,
+    end: 0.5,
+  });
   // const [result, setResult] = useState(null);
 
   const sliderRef = useRef([]);
@@ -51,7 +66,7 @@ function App() {
       flushSync(() => {
         setListInterval(intervalStack);
       });
-      await delay(500);
+      await delay(delayTimeBetweenDigits.start * 1000);
     }
   };
 
@@ -75,13 +90,13 @@ function App() {
     //   return prev;
     // });
     for (let i = listInterval.length - 1; i > -1; i--) {
-      await delay(500);
+      await delay(delayTimeBetweenDigits.end * 1000);
       clearInterval(listInterval[i]);
       await delay(100);
       sliderRef.current[i].slickGoTo(Number(resultTemp[i]));
     }
     setListInterval([]);
-  }, [valueRange, listInterval, numOfDigits]);
+  }, [valueRange, listInterval, numOfDigits, delayTimeBetweenDigits.end]);
 
   const onChangeRange = ({ target }) => {
     if (!isDrawing) {
@@ -98,6 +113,15 @@ function App() {
     }
   };
 
+  const onChangeDelayTimeBetweenDigits = ({ target }) => {
+    if (!isDrawing) {
+      setDelayTimeBetweenDigits((prev) => ({
+        ...prev,
+        [target.name]: target.value,
+      }));
+    }
+  };
+
   const addToRefs = (el) => {
     if (el && !sliderRef.current.includes(el)) {
       sliderRef.current.push(el);
@@ -105,17 +129,6 @@ function App() {
   };
 
   const isDrawing = listInterval.length > 0;
-
-  const sliderSettings = {
-    infinite: true,
-    speed: 50,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrow: false,
-    vertical: true,
-    accessibility: false,
-    swipe: false,
-  };
 
   useEffect(() => {
     let delayStop = null;
@@ -175,6 +188,24 @@ function App() {
               type='number'
               onChange={onChangeDelay}
               value={delayTime}
+            />
+          </div>
+          <div className='input-block'>
+            <label>Delay between digits at start (s):</label>
+            <input
+              name='start'
+              type='number'
+              onChange={onChangeDelayTimeBetweenDigits}
+              value={delayTimeBetweenDigits.start}
+            />
+          </div>
+          <div className='input-block'>
+            <label>Delay between digits at stop (s):</label>
+            <input
+              name='end'
+              type='number'
+              onChange={onChangeDelayTimeBetweenDigits}
+              value={delayTimeBetweenDigits.end}
             />
           </div>
         </div>

@@ -86,6 +86,11 @@ button {
   border: none;
   color: white;
   cursor: pointer;
+  width: 100%;
+}
+
+label {
+  margin-bottom: 4px;
 }
 
 button:disabled {
@@ -94,10 +99,11 @@ button:disabled {
 }
 
 input {
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 4px;
   outline: none;
   border: 1px solid #757575;
+  font-size: 1rem;
 }
 
 input::-webkit-outer-spin-button,
